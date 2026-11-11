@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "edutrace-open"
+version = "0.1.0"
+description = "EduTrace-Open: Synthetic longitudinal multimodal higher-education dataset generator."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Dr. Sanjay Agal", email = "sanjay.agal32685@paruluniversity.ac.in" }
+]
+keywords = [
+  "synthetic-data", "learning-analytics", "educational-data-mining",
+  "longitudinal", "reproducibility", "higher-education"
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering",
+]
+dependencies = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "polars>=0.20,<2",
+  "pyarrow>=15,<20",
+  "duckdb>=1.0,<2",
+  "scipy>=1.12,<2",
+  "pydantic>=2.7,<3",
+  "PyYAML>=6.0,<7",
+  "typer>=0.12,<1",
+  "rich>=13.7,<15",
+  "python-dateutil>=2.9,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.2,<9",
+  "pytest-cov>=5,<7",
+  "ruff>=0.5,<1",
+  "matplotlib>=3.8,<4",
+  "scikit-learn>=1.4,<2",
+  "pre-commit>=3.7,<5",
+]
+
+[project.scripts]
+edutrace = "edutrace.cli:app"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4", "SIM", "RUF"]
+ignore = [
+  "E501",
+  # Typer's documented pattern is ``param: Type = typer.Option(...)``.
+  # B008 flags function calls in argument defaults, but typer.Option
+  # returns an immutable singleton, not a mutable default.
+  "B008",
+  # ``class EventType(str, Enum)`` is deliberate: ``StrEnum`` changes
+  # ``str(member)`` from "EventType.LOGIN" to "login" and would require
+  # re-verifying every serialization site.
+  "UP042",
+  # ``__all__`` in this project is ordered by dependency / generation
+  # sequence, not alphabetically, so package reading order is preserved.
+  "RUF022",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Test loops occasionally unpack tuples for readability even when one
+# element is unused.
+"tests/*" = ["B007"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers"
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+  "slow: marks tests that take more than a few seconds",
+  "integration: marks end-to-end integration tests",
+]
+
+[tool.coverage.run]
+source = ["edutrace"]
+omit = ["*/tests/*"]

@@ -1,0 +1,44 @@
+project:
+  name: EduTrace-Open
+  version: "0.1.0"
+  random_seed: 20261110
+  timezone: "Asia/Kolkata"
+
+generation:
+  profile: standard
+  num_institutions: 2
+  num_programmes: 8
+  num_courses_per_programme: 8
+  num_modules_per_course: 4
+  num_learners: 10000
+  num_academic_years: 3
+  semesters_per_year: 2
+  weeks_per_semester: 15
+  resources_per_module: 6
+  assessment_items_per_module: 3
+  mean_events_per_learner_week: 14.0
+  mean_support_events_per_learner: 0.8
+  academic_calendar_start: "2023-08-01"
+
+output:
+  directory: data/generated
+  formats: [parquet, csv]
+  compression: zstd
+  row_group_size: 200000
+  include_manifest: true
+
+pipeline:
+  chunk_size: 50000
+  checkpoint:
+    enabled: true
+    directory: checkpoints
+    every_n_learners: 2000
+
+validation:
+  enabled: true
+  strict: false
+  check_primary_keys: true
+  check_foreign_keys: true
+  check_temporal_integrity: true
+  check_distributions: true
+  check_leakage: true
